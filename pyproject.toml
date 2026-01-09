@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "tab_lang_graph"
 version = "0.1.0"
 description = "Spreadsheet to LangGraph Integration Bridge"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.100.0",
     "uvicorn>=0.20.0",

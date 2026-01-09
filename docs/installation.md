@@ -4,7 +4,7 @@ This guide covers the installation steps for both the Backend Services (Server &
 
 ## Prerequisites
 
-*   **Python**: Version 3.10 or higher.
+*   **Python**: Version 3.12 or higher.
 *   **LibreOffice**: Version 7.0 or higher (Calc).
 *   **Git**: To clone the repository.
 
