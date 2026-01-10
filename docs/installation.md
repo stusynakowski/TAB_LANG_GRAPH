@@ -72,8 +72,14 @@ LG_PORT=8000
 ### 5. Verify Installation
 Run the test suite to ensure the environment is correctly set up.
 
+You can run the full test suite:
 ```bash
 pytest
+```
+
+Or run the specific "Hello World" scenario tests to verify the core integration components (Macro Logic, Server Ping, Round-trip):
+```bash
+pytest tests/test_hello_world_scenarios.py
 ```
 
 ---

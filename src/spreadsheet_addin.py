@@ -5,6 +5,39 @@ import urllib.error
 # Configuration
 BRIDGE_URL = "http://127.0.0.1:8000"
 
+def _msgbox(message):
+    """
+    Display a message box in LibreOffice. 
+    Useful because print() output is not visible in the standard GUI.
+    """
+    try:
+        # XSCRIPTCONTEXT is injected by LibreOffice automatically
+        ctx = XSCRIPTCONTEXT.getComponentContext()
+        sm = ctx.ServiceManager
+        toolkit = sm.createInstanceWithContext("com.sun.star.awt.Toolkit", ctx)
+        parent = toolkit.getDesktopWindow()
+        
+        # createMessageBox params: Parent, Type, Buttons, Title, Message
+        # Type: infobox=1
+        # Buttons: 1 (OK)
+        box = toolkit.createMessageBox(parent, "infobox", 1, "TabLangGraph", str(message))
+        box.execute()
+    except NameError:
+        # Fallback for testing outside LibreOffice
+        print(f"DEBUG (MsgBox): {message}")
+    except Exception as e:
+        print(f"Failed to show MsgBox: {e}")
+
+def TestBackendConnection(*args):
+    """
+    A Macro you can run via 'Tools > Macros > Run Macro'.
+    This helps verify that:
+    1. Python execution is working in LibreOffice.
+    2. Connection to the backend server is working.
+    """
+    result = LG_CALL("Echo", "Ping from Macro")
+    _msgbox(f"Backend Response:\n{result}")
+
 def LG_CALL(workflow_name, *args):
     """
     Main entry point for LibreOffice Calc.
@@ -50,11 +83,11 @@ def LG_CALL(workflow_name, *args):
                     return f"#LG_ERR: {resp_json.get('error_message')}"
             else:
                 return f"#LG_ERR: HTTP {response.status}"
-                
+    
     except urllib.error.URLError as e:
-        return f"#LG_ERR: Connection Refused - Is Bridge Running?"
+        return f"#LG_ERR: Connection Refused - {e.reason}"
     except Exception as e:
-        return f"#LG_ERR: {str(e)}"
+        return f"#LG_ERR: Unexpected - {str(e)}"
 
-# LibreOffice script registration mechanism would go here
-# g_exportedScripts = (LG_CALL,)
+# LibreOffice script registration mechanism
+g_exportedScripts = (LG_CALL, TestBackendConnection)
