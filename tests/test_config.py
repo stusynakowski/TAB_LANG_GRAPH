@@ -1,6 +1,6 @@
 import os
 import pytest
-from tab_lang_graph.config import Settings
+from fancy_sheet_functions.config import Settings
 
 def test_default_settings():
     settings = Settings()

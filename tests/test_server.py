@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from tab_lang_graph.server import app
+from fancy_sheet_functions.server import app
 
 client = TestClient(app)
 

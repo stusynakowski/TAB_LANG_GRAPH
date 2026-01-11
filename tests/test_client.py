@@ -1,6 +1,6 @@
 import pytest
 from unittest.mock import patch, MagicMock
-from tab_lang_graph.client import SpreadsheetClient
+from fancy_sheet_functions.client import SpreadsheetClient
 
 # Mock data
 MOCK_WORKFLOWS = [

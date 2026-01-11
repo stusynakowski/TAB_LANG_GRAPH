@@ -12,6 +12,7 @@ class WorkflowDefinition(BaseModel):
     name: str
     description: str
     inputs: List[WorkflowInput]
+    metadata: Dict[str, Any] = {}
 
 class ExecutionRequest(BaseModel):
     workflow_id: str

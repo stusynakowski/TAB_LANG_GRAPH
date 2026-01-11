@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
-from tab_lang_graph.config import settings
+from fancy_sheet_functions.config import settings
 import os
 
 # This is a placeholder for the UI logic described in spec 005
@@ -53,7 +53,52 @@ def render_history_table():
                 else:
                     st.info("No history yet")
         except:
-            st.warning("Could not fetch history")
+            st.error("Failed to fetch history")
+
+def render_task_manager():
+    st.header("📋 Pending Tasks Manager")
+    try:
+        resp = requests.get(f"http://{settings.LG_HOST}:{settings.LG_PORT}/tasks")
+        if resp.status_code == 200:
+            tasks = resp.json()
+            if not tasks:
+                st.info("No tasks found.")
+                return
+
+            # Filter for active tasks (Pending/Running)
+            active_tasks = [t for t in tasks if t['status'] in ['pending_approval', 'running']]
+            
+            if active_tasks:
+                st.subheader(f"Active Tasks ({len(active_tasks)})")
+                for task in active_tasks:
+                    with st.container():
+                        col1, col2, col3, col4 = st.columns([2, 2, 2, 2])
+                        with col1:
+                            st.write(f"**{task['workflow_id']}**")
+                            st.caption(f"ID: {task['task_id'][:8]}...")
+                        with col2:
+                            st.write(task['status'])
+                        with col3:
+                            if task['status'] == 'pending_approval':
+                                if st.button("✅ Approve & Run", key=f"run_{task['task_id']}"):
+                                    requests.post(f"http://{settings.LG_HOST}:{settings.LG_PORT}/tasks/{task['task_id']}/approve")
+                                    st.rerun()
+                        with col4:
+                            if st.button("❌ Cancel", key=f"cancel_{task['task_id']}"):
+                                requests.post(f"http://{settings.LG_HOST}:{settings.LG_PORT}/tasks/{task['task_id']}/cancel")
+                                st.rerun()
+                        st.divider()
+            
+            # Completed Tasks Expander
+            with st.expander("Completed / Failed Tasks"):
+                done_tasks = [t for t in tasks if t['status'] not in ['pending_approval', 'running']]
+                if done_tasks:
+                    st.dataframe(pd.DataFrame(done_tasks))
+                else:
+                    st.info("No completed tasks.")
+
+    except Exception as e:
+        st.error(f"Failed to fetch tasks: {e}")
 
 def render_tutorial():
     with st.expander("📚 How to use in LibreOffice"):
@@ -152,6 +197,7 @@ def main():
     if "Registry" in show_sections:
         render_available_tools()
         
+    render_task_manager()
     
 
 if __name__ == "__main__":

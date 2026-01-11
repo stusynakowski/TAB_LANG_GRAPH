@@ -939,6 +939,18 @@ wheels = [
 ]
 
 [[package]]
+name = "scrapetube"
+version = "2.6.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+    { name = "typing-extensions" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f6/9f/a1a209c52605bc04499461f3e8ce05ab90a7f45b0f09b950e0a4e6b78a92/scrapetube-2.6.0-py3-none-any.whl", hash = "sha256:70077c2b80474896cd2490801d1ce33488bc8fb8ef9d2137f683a799ffac00af", size = 5874, upload-time = "2025-09-16T17:47:21.108Z" },
+]
+
+[[package]]
 name = "six"
 version = "1.17.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1011,6 +1023,7 @@ dependencies = [
     { name = "pytest" },
     { name = "python-dotenv" },
     { name = "requests" },
+    { name = "scrapetube" },
     { name = "streamlit" },
     { name = "uvicorn" },
 ]
@@ -1035,7 +1048,8 @@ requires-dist = [
     { name = "python-dotenv", specifier = ">=1.0.0" },
     { name = "requests", specifier = ">=2.31.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
-    { name = "streamlit", specifier = ">=1.30.0" },
+    { name = "scrapetube", specifier = ">=2.1.0" },
+    { name = "streamlit", specifier = ">=1.35.0" },
     { name = "uvicorn", specifier = ">=0.20.0" },
 ]
 provides-extras = ["dev"]

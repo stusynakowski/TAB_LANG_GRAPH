@@ -1,6 +1,6 @@
 import pytest
-from tab_lang_graph.registry import WorkflowRegistry
-from tab_lang_graph.schemas import WorkflowDefinition
+from fancy_sheet_functions.registry import WorkflowRegistry
+from fancy_sheet_functions.schemas import WorkflowDefinition
 
 def test_registry_initialization():
     registry = WorkflowRegistry()

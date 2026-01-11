@@ -7,7 +7,7 @@ class WorkflowRegistry:
         self._workflows: Dict[str, WorkflowDefinition] = {}
         self._executors: Dict[str, Callable] = {}
 
-    def register_function(self, name: str, func: Callable, description: str = "", inputs: list = None):
+    def register_function(self, name: str, func: Callable, description: str = "", inputs: list = None, metadata: Dict[str, Any] = None):
         """
         Register a simple python function as a workflow.
         """
@@ -39,7 +39,8 @@ class WorkflowRegistry:
             id=workflow_id,
             name=name,
             description=description,
-            inputs=inputs or []
+            inputs=inputs or [],
+            metadata=metadata or {}
         )
         
         self._workflows[workflow_id] = definition

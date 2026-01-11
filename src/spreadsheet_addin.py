@@ -43,32 +43,39 @@ def FSF(workflow_name, *args):
     Main entry point for LibreOffice Calc.
     Usage in cell: =FSF("Echo", "Hello World")
     """
+    # 0. Check for TIMEOUT and SAVE overloads
+    timeout = 5
+    save_to_file = False
+    clean_args = []
+    if args:
+        for arg in args:
+            if isinstance(arg, str):
+                if arg.startswith("TIMEOUT="):
+                    try:
+                        timeout = int(arg.split("=")[1])
+                    except ValueError:
+                        pass # Ignore invalid timeout format
+                elif arg.replace(" ", "").upper() == "SAVE=TRUE":
+                    save_to_file = True
+                else:
+                    clean_args.append(arg)
+            else:
+                clean_args.append(arg)
+
     # 1. Construct Payload
-    # We assume *args are passed as a list of arguments to the workflow
-    # For simplicity in this POC, we map positional args to the workflow's input schema
-    # But since we don't know the schema here easily without querying, 
-    # let's assume the user passes a single value or we pass them as a list named 'args'
-    # Or, we strictly follow the 'Echo' example which takes 'text'.
-    
-    # improved data mapping strategy needed for generic case, 
-    # but for "Echo", args[0] is text.
-    
-    # We'll try to guess a dictionary if we can, otherwise pass as list?
-    # For the "Echo" POC, let's assume the first arg is "text".
-    
     payload = {
         "workflow_id": workflow_name.lower(),
-        "positional_args": list(args) if args else [],
+        "positional_args": clean_args,
         "arguments": {},
-        "cell_reference": "Unknown" # LO API would provide this if we used the context
+        "cell_reference": "Unknown" 
     }
     
     try:
         # Debug logging to /tmp
-        # We use explicit utf-8, but also fallback to ascii replacement if the environment forces it
         with open("/tmp/FancySheetFunctions_debug.log", "a", encoding="utf-8", errors="replace") as f:
-             safe_args = str(args)
-             f.write(f"Calling {workflow_name} with {safe_args}\n")
+             safe_args = str(clean_args)
+             timeout_info = f"[Timeout: {timeout}s] [Save: {save_to_file}]"
+             f.write(f"Calling {workflow_name} with {safe_args} {timeout_info}\n")
 
         # 2. Prepare Request
         data = json.dumps(payload).encode('utf-8')
@@ -79,22 +86,70 @@ def FSF(workflow_name, *args):
         )
         
         # 3. Execute
-        with urllib.request.urlopen(req, timeout=5) as response:
+        with urllib.request.urlopen(req, timeout=timeout) as response:
             if response.status == 200:
                 resp_body = response.read()
                 resp_json = json.loads(resp_body)
                 
                 if resp_json['status'] == 'success':
-                    return resp_json['result']
+                    result = resp_json['result']
+                    
+                    if save_to_file:
+                        try:
+                            saved_path = _save_result_locally(workflow_name, result)
+                            return f"Saved: {saved_path}"
+                        except Exception as e:
+                            return f"#FSF_SAVE_ERR: {str(e)}"
+                            
+                    return result
                 else:
                     return f"#LG_ERR: {resp_json.get('error_message')}"
             else:
                 return f"#LG_ERR: HTTP {response.status}"
     
     except urllib.error.URLError as e:
+        if isinstance(e.reason, TimeoutError) or "timed out" in str(e).lower():
+            return f"#LG_TIMEOUT: Exceeded {timeout}s. Try adding 'TIMEOUT=60' to args."
         return f"#LG_ERR: Connection Refused - {e.reason}"
     except Exception as e:
+        if "timed out" in str(e).lower():
+            return f"#LG_TIMEOUT: Exceeded {timeout}s. Try adding 'TIMEOUT=60' to args."
         return f"#LG_ERR: Unexpected - {str(e)}"
+
+def _save_result_locally(name, data):
+    """
+    Saves data to a folder next to the current spreadsheet.
+    """
+    import os
+    import datetime
+    import uno
+    
+    try:
+        doc = XSCRIPTCONTEXT.getDocument()
+        url = doc.getURL()
+        if not url:
+            raise Exception("Spreadsheet must be saved first")
+            
+        # Convert file:/// path to system path
+        doc_path = uno.fileUrlToSystemPath(url)
+        base_dir = os.path.dirname(doc_path)
+        
+        # Create output directory
+        out_dir = os.path.join(base_dir, "fancy_sheet_functions_temp_storage")
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+            
+        # Generate filename
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        fname = f"{name}_{timestamp}.json"
+        full_path = os.path.join(out_dir, fname)
+        
+        with open(full_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+            
+        return fname
+    except NameError:
+        raise Exception("Cannot access spreadsheet context (Are you running in LO?)")
 
 # LibreOffice script registration mechanism
 g_exportedScripts = (FSF, TestBackendConnection)

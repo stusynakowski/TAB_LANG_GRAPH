@@ -1,6 +1,6 @@
 import pytest
-from tab_lang_graph.registry import WorkflowRegistry
-from tab_lang_graph.library import setup_library, to_upper
+from fancy_sheet_functions.registry import WorkflowRegistry
+from fancy_sheet_functions.library import setup_library, to_upper
 
 def test_library_registration():
     registry = WorkflowRegistry()

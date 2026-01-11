@@ -17,7 +17,7 @@ There is currently no effective interface bridging the structured, tabular envir
 - **Language**: Python (for the Bridge and LangGraph backend).
 - **Tabular Tool**: LibreOffice Calc.
 - **Testing**: pytest.
-- **Packaging**: src-layout (`src/tab_lang_graph`).
+- **Packaging**: src-layout (`src/fancy_sheet_functions`).
 - **Non-goals**:
     - Replacing the internal calculation engine of LibreOffice.
     - Cloud-hosted SaaS (initial focus is local execution).

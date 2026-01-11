@@ -8,7 +8,7 @@ import os
 sys.path.append(os.path.abspath("src"))
 
 from spreadsheet_addin import LG_CALL
-from tab_lang_graph.server import app
+from fancy_sheet_functions.server import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)

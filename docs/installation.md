@@ -16,8 +16,8 @@ This component runs the local bridge that connects your spreadsheet to Python/La
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/stusynakowski/TAB_LANG_GRAPH.git
-cd TAB_LANG_GRAPH
+git clone https://github.com/stusynakowski/FANCY_SHEET_FUNCTIONS.git
+cd FANCY_SHEET_FUNCTIONS
 ```
 
 ### 2. Set up Python Environment

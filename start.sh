@@ -44,9 +44,9 @@ export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 
 if command -v uv &> /dev/null && [ -f "uv.lock" ]; then
     echo "Detected uv project, using uv run..."
-    uv run uvicorn tab_lang_graph.server:app --reload --port 8000 > backend.log 2>&1 &
+    uv run uvicorn fancy_sheet_functions.server:app --reload --port 8000 > backend.log 2>&1 &
 else
-    uvicorn tab_lang_graph.server:app --reload --port 8000 > backend.log 2>&1 &
+    uvicorn fancy_sheet_functions.server:app --reload --port 8000 > backend.log 2>&1 &
 fi
 SERVER_PID=$!
 

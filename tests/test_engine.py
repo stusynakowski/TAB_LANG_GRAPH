@@ -1,8 +1,8 @@
 import pytest
 import asyncio
-from tab_lang_graph.engine import ExecutionEngine
-from tab_lang_graph.registry import WorkflowRegistry
-from tab_lang_graph.schemas import ExecutionRequest
+from fancy_sheet_functions.engine import ExecutionEngine
+from fancy_sheet_functions.registry import WorkflowRegistry
+from fancy_sheet_functions.schemas import ExecutionRequest
 
 @pytest.mark.asyncio
 async def test_execution_synch_success():
