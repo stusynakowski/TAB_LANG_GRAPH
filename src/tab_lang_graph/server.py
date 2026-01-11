@@ -4,11 +4,14 @@ from .registry import WorkflowRegistry
 from .engine import ExecutionEngine
 from .schemas import ExecutionRequest, ExecutionResponse, BridgeStatus
 from .config import settings
+from .library import setup_library
 
 app = FastAPI(title="TabLangGraph Bridge")
 
 # Singleton instances (for now)
 registry = WorkflowRegistry()
+setup_library(registry)
+
 engine = ExecutionEngine(registry)
 execution_history: List[ExecutionResponse] = []
 

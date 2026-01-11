@@ -20,7 +20,7 @@ def _msgbox(message):
         # createMessageBox params: Parent, Type, Buttons, Title, Message
         # Type: infobox=1
         # Buttons: 1 (OK)
-        box = toolkit.createMessageBox(parent, "infobox", 1, "TabLangGraph", str(message))
+        box = toolkit.createMessageBox(parent, "infobox", 1, "FancySheetFunctions", str(message))
         box.execute()
     except NameError:
         # Fallback for testing outside LibreOffice
@@ -35,13 +35,13 @@ def TestBackendConnection(*args):
     1. Python execution is working in LibreOffice.
     2. Connection to the backend server is working.
     """
-    result = LG_CALL("Echo", "Ping from Macro")
+    result = FSF("Echo", "Ping from Macro")
     _msgbox(f"Backend Response:\n{result}")
 
-def LG_CALL(workflow_name, *args):
+def FSF(workflow_name, *args):
     """
     Main entry point for LibreOffice Calc.
-    Usage in cell: =LG_CALL("Echo", "Hello World")
+    Usage in cell: =FSF("Echo", "Hello World")
     """
     # 1. Construct Payload
     # We assume *args are passed as a list of arguments to the workflow
@@ -58,11 +58,16 @@ def LG_CALL(workflow_name, *args):
     
     payload = {
         "workflow_id": workflow_name.lower(),
-        "arguments": {"text": str(args[0])} if args else {},
+        "positional_args": list(args) if args else [],
+        "arguments": {},
         "cell_reference": "Unknown" # LO API would provide this if we used the context
     }
     
     try:
+        # Debug logging to /tmp
+        with open("/tmp/FancySheetFunctions_debug.log", "a") as f:
+             f.write(f"Calling {workflow_name} with {args}\n")
+
         # 2. Prepare Request
         data = json.dumps(payload).encode('utf-8')
         req = urllib.request.Request(
@@ -90,4 +95,4 @@ def LG_CALL(workflow_name, *args):
         return f"#LG_ERR: Unexpected - {str(e)}"
 
 # LibreOffice script registration mechanism
-g_exportedScripts = (LG_CALL, TestBackendConnection)
+g_exportedScripts = (FSF, TestBackendConnection)

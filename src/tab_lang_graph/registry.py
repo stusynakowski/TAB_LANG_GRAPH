@@ -1,5 +1,6 @@
 from typing import Dict, Any, Callable
 from .schemas import WorkflowDefinition, WorkflowInput
+import inspect
 
 class WorkflowRegistry:
     def __init__(self):
@@ -12,6 +13,28 @@ class WorkflowRegistry:
         """
         workflow_id = name.lower() # simplify ID generation for now
         
+        if inputs is None:
+            inputs = []
+            sig = inspect.signature(func)
+            for param_name, param in sig.parameters.items():
+                if param_name == 'self': continue
+                param_type = "string" # default
+                if param.annotation != inspect.Parameter.empty:
+                    if param.annotation == int:
+                        param_type = "number"
+                    elif param.annotation == float:
+                        param_type = "number"
+                    elif param.annotation == bool:
+                        param_type = "boolean"
+                    elif param.annotation == str:
+                        param_type = "string"
+                    elif param.annotation == list:
+                        param_type = "array"
+                    elif param.annotation == dict:
+                        param_type = "object"
+                
+                inputs.append({"name": param_name, "type": param_type})
+
         definition = WorkflowDefinition(
             id=workflow_id,
             name=name,

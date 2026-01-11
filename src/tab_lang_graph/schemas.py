@@ -15,7 +15,8 @@ class WorkflowDefinition(BaseModel):
 
 class ExecutionRequest(BaseModel):
     workflow_id: str
-    arguments: Dict[str, Any]
+    arguments: Dict[str, Any] = {}
+    positional_args: List[Any] = []
     cell_reference: Optional[str] = None
     request_id: str = Field(default_factory=lambda: str(uuid4()))
 

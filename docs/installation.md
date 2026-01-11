@@ -105,7 +105,7 @@ Replace `/path/to/repo` with your actual path.
 mkdir -p ~/Library/Application\ Support/LibreOffice/4/user/Scripts/python/
 
 # Create Symlink
-ln -s "$(pwd)/src/spreadsheet_addin.py" ~/Library/Application\ Support/LibreOffice/4/user/Scripts/python/lg_bridge.py
+ln -s "$(pwd)/src/spreadsheet_addin.py" ~/Library/Application\ Support/LibreOffice/4/user/Scripts/python/fsf_bridge.py
 ```
 
 **Option B: Copy (Windows/Simple)**
@@ -114,8 +114,8 @@ Copy the file `src/spreadsheet_addin.py` to the folder identified in Step 1.
 ### 3. Verify in LibreOffice
 1.  Open LibreOffice Calc.
 2.  Go to **Tools** > **Macros** > **Run Macro...**
-3.  Navigate to **My Macros** > **lg_bridge** (or the name of the file you copied).
-4.  You should see the function `LG_CALL`.
+3.  Navigate to **My Macros** > **FancySheetFunctions**.
+4.  You should see the function `FSF`.
 
 ---
 
@@ -126,12 +126,12 @@ To use the system, the specific servers must be running.
 ### 1. Start the Bridge Server
 Open a terminal in your project root (with venv activated):
 ```bash
-uvicorn tab_lang_graph.server:app --reload
+./start.sh
 ```
 *   Server will run at `http://127.0.0.1:8000`.
 
 ### 2. Start the Management UI (Optional)
-Open a new terminal tab (with venv activated):
+The `start.sh` script should also help with this, or run:
 ```bash
 streamlit run src/management_ui.py
 ```
@@ -140,6 +140,6 @@ streamlit run src/management_ui.py
 ### 3. Use in Spreadsheet
 In any cell in LibreOffice Calc, use the formula:
 ```excel
-=LG_CALL("Echo", "Hello World")
+=FSF("Echo", "Hello World")
 ```
 If successful, the cell should update with `Echo: Hello World`.

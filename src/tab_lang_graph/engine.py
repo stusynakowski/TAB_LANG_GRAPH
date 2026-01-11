@@ -34,9 +34,15 @@ class ExecutionEngine:
         try:
             # Check if executor is async
             if asyncio.iscoroutinefunction(executor):
-                result = await executor(**request.arguments)
+                if request.positional_args:
+                    result = await executor(*request.positional_args, **request.arguments)
+                else:
+                    result = await executor(**request.arguments)
             else:
-                result = executor(**request.arguments)
+                if request.positional_args:
+                    result = executor(*request.positional_args, **request.arguments)
+                else:
+                    result = executor(**request.arguments)
                 
             duration = (time.time() - start_time) * 1000
             return ExecutionResponse(

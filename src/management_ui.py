@@ -7,7 +7,7 @@ from tab_lang_graph.config import settings
 # In a real app, this would be a separate streamlit app file.
 
 def render_sidebar():
-    st.sidebar.title("TabLangGraph")
+    st.sidebar.title("TabLangGraph Management UI")
     status = get_status()
     st.sidebar.metric("Status", status.get("status", "Unknown"))
     
@@ -44,8 +44,71 @@ def render_history_table():
     except:
         st.warning("Could not fetch history")
 
+def render_tutorial():
+    with st.expander("📚 How to use in LibreOffice"):
+        st.markdown("""
+        ### Setup
+        Ensure the backend server is running and the macros are installed.
+
+        ### Calling Functions
+        Use the custom function `=FSF()` in any cell.
+
+        **Syntax:**
+        `=FSF("FunctionName", "Argument")`
+
+        **Examples:**
+        - Echo test: 
+          `=FSF("Echo", "Hello World")`
+        - Convert to upper case: 
+          `=FSF("ToUpper", "some text")`
+        
+        *Note: The first argument is the Function Name string.*
+        """)
+
+def render_available_tools():
+    with st.expander("🛠 Available Tools Registry"):
+        try:
+            resp = requests.get(f"http://{settings.LG_HOST}:{settings.LG_PORT}/workflows")
+            if resp.status_code == 200:
+                workflows = resp.json()
+                if workflows:
+                    for wf in workflows:
+                        c1, c2 = st.columns([1, 2])
+                        with c1:
+                            st.subheader(wf.get('name'))
+                        with c2:
+                            st.caption(wf.get('description'))
+                            inputs = wf.get('inputs', [])
+                            if inputs:
+                                input_str = ", ".join([f"{i['name']}: {i['type']}" for i in inputs])
+                                st.text(f"Inputs: {input_str}")
+                        st.divider()
+                else:
+                    st.info("No workflows registered.")
+            else:
+                st.error("Failed to fetch workflows.")
+        except Exception as e:
+            st.error(f"Error connecting to registry: {e}")
+
 def main():
     render_sidebar()
+    
+    st.title("Management UI")
+
+    # Visibility controls
+    show_sections = st.segmented_control(
+        "Visibility",
+        options=["Tutorial", "Registry"],
+        selection_mode="multi",
+        default=["Tutorial", "Registry"]
+    )
+    
+    if "Tutorial" in show_sections:
+        render_tutorial()
+        
+    if "Registry" in show_sections:
+        render_available_tools()
+        
     render_history_table()
 
 if __name__ == "__main__":

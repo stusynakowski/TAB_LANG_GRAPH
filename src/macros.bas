@@ -18,12 +18,12 @@ Public Function GetPythonScript(macro As String, _
     GetPythonScript = sp.getScript(uri)
 End Function
 
-' Your Wrapper Function for use in Cells: =LGCALL("Echo"; "Hello") (Note: check if your locale uses ; or ,)
-Public Function LGCALL(workflow_name As String, Optional arg1) As Variant
+' Your Wrapper Function for use in Cells: =FSF("Echo"; "Hello") (Note: check if your locale uses ; or ,)
+Public Function FSF(workflow_name As String, Optional arg1) As Variant
     On Error GoTo ErrorHandler
     Dim script As Object
-    ' Update: You placed the file in the OS Application directory (Shared), named 'lg_bridge.py'
-    script = GetPythonScript("lg_bridge.py$LG_CALL", "share")
+    ' Update: You placed the file in the OS Application directory (Shared), named 'fsf_bridge.py'
+    script = GetPythonScript("fsf_bridge.py$FSF", "user")
     
     Dim args() As Variant
     
@@ -37,9 +37,9 @@ Public Function LGCALL(workflow_name As String, Optional arg1) As Variant
     
     ' Invoke the Python function
     ' returns the result from Python
-    LGCALL = script.invoke(args, Array(), Array())
+    FSF = script.invoke(args, Array(), Array())
     Exit Function
 
 ErrorHandler:
-    LGCALL = "Basic Error: " & Error()
+    FSF = "Basic Error: " & Error()
 End Function
