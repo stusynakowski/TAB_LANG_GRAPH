@@ -65,8 +65,10 @@ def FSF(workflow_name, *args):
     
     try:
         # Debug logging to /tmp
-        with open("/tmp/FancySheetFunctions_debug.log", "a") as f:
-             f.write(f"Calling {workflow_name} with {args}\n")
+        # We use explicit utf-8, but also fallback to ascii replacement if the environment forces it
+        with open("/tmp/FancySheetFunctions_debug.log", "a", encoding="utf-8", errors="replace") as f:
+             safe_args = str(args)
+             f.write(f"Calling {workflow_name} with {safe_args}\n")
 
         # 2. Prepare Request
         data = json.dumps(payload).encode('utf-8')
