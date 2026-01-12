@@ -7,7 +7,8 @@ import os
 # Add src to path to import modules correctly
 sys.path.append(os.path.abspath("src"))
 
-from spreadsheet_addin import LG_CALL
+from spreadsheet_addin import FSF
+
 from fancy_sheet_functions.server import app
 from fastapi.testclient import TestClient
 
@@ -36,8 +37,8 @@ def test_macro_execution_client_side():
     mock_response.__exit__.return_value = None
     
     with patch('urllib.request.urlopen', return_value=mock_response) as mock_urlopen:
-        # Simulate user typing in cell: =LG_CALL("Echo", "Hello World")
-        result = LG_CALL("Echo", "Hello World")
+        # Simulate user typing in cell: =FSF("Echo", "Hello World")
+        result = FSF("Echo", "Hello World")
         
         # Verify the macro returned the pure result string to the cell
         assert result == "Echo: Hello World"
@@ -48,7 +49,7 @@ def test_macro_execution_client_side():
         payload_sent = json.loads(request_sent.data)
         
         assert payload_sent["workflow_id"] == "echo"
-        assert payload_sent["arguments"]["text"] == "Hello World"
+        assert payload_sent["positional_args"] == ["Hello World"]
 
 # -------------------------------------------------------------------------
 # Test 2: Ping Message & Streamlit Visibility (Server Integration)
@@ -109,8 +110,8 @@ def test_full_round_trip_response():
     mock_network_response.__exit__.return_value = None
     
     with patch('urllib.request.urlopen', return_value=mock_network_response):
-        # User types: =LG_CALL("Echo", "RoundTrip")
-        cell_output = LG_CALL("Echo", "RoundTrip")
+        # User types: =FSF("Echo", "RoundTrip")
+        cell_output = FSF("Echo", "RoundTrip")
         
         # Verify exactly what is put back into the cell
         assert cell_output == "Echo: RoundTrip"
@@ -125,6 +126,6 @@ def test_full_round_trip_response():
     mock_network_response.read.return_value = json.dumps(error_response_body).encode('utf-8')
     
     with patch('urllib.request.urlopen', return_value=mock_network_response):
-        error_output = LG_CALL("Echo", "ErrorCase")
+        error_output = FSF("Echo", "ErrorCase")
         # Verify the spreadsheet gets a proper error string
         assert error_output == "#LG_ERR: Something went wrong"

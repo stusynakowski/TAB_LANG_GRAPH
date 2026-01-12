@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.append(os.path.abspath("src"))
 
-from spreadsheet_addin import LG_CALL
+from spreadsheet_addin import FSF
 
 def test_lg_call_success():
     # Mock urllib.request.urlopen
@@ -17,9 +17,11 @@ def test_lg_call_success():
         "status": "success",
         "result": "Echo: Hello"
     }).encode('utf-8')
+    mock_response.__enter__.return_value = mock_response
+    mock_response.__exit__.return_value = None
     
     with patch('urllib.request.urlopen', return_value=mock_response) as mock_urlopen:
-        result = LG_CALL("Echo", "Hello")
+        result = FSF("Echo", "Hello")
         assert result == "Echo: Hello"
         
         # Verify request
@@ -28,7 +30,8 @@ def test_lg_call_success():
         assert req.full_url == "http://127.0.0.1:8000/execute"
         sent_data = json.loads(req.data)
         assert sent_data['workflow_id'] == "echo"
-        assert sent_data['arguments']['text'] == "Hello"
+        # assert sent_data['arguments']['text'] == "Hello"    <-- This is wrong, FSF uses positional_args
+        assert sent_data['positional_args'] == ["Hello"]
 
 def test_lg_call_api_error():
     mock_response = MagicMock()
@@ -37,12 +40,14 @@ def test_lg_call_api_error():
         "status": "error",
         "error_message": "Workflow failure"
     }).encode('utf-8')
+    mock_response.__enter__.return_value = mock_response
+    mock_response.__exit__.return_value = None
     
     with patch('urllib.request.urlopen', return_value=mock_response):
-        result = LG_CALL("Echo", "Fail")
-        assert result == "#LG_ERR: Workflow failure"
+        result = FSF("Echo", "Fail")
+        assert result == "Error: Workflow failure"
 
 def test_lg_call_connection_error():
     with patch('urllib.request.urlopen', side_effect=Exception("Connection refused")):
-        result = LG_CALL("Echo", "Hello")
-        assert "#LG_ERR" in result
+        result = FSF("Echo", "Hello")
+        assert "Error:" in result

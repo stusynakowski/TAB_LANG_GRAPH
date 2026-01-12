@@ -13,7 +13,7 @@ def test_library_registration():
     assert "toupper" in workflow_ids
     assert "tolower" in workflow_ids
     assert "concatenate" in workflow_ids
-    assert "llm_summarize" in workflow_ids
+    assert "llm_sumarize_test" in workflow_ids
 
 def test_introspection():
     registry = WorkflowRegistry()

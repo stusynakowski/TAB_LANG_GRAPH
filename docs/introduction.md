@@ -9,7 +9,7 @@ There is currently no effective interface bridging the structured, tabular envir
 - **Workflow Automators**: Users who want to build repeatable data processing pipelines where an agent acts as a function within a larger calculation chain.
 
 ## Use Cases
-- **UC-001 (Spreadsheet Integration)**: Invoking a LangGraph agent or custom tool directly from a cell formula (e.g., `=LG_SUMMARIZE(A1)`), treating complex LLM reasoning as a standard spreadsheet function.
+- **UC-001 (Spreadsheet Integration)**: Invoking a LangGraph agent or custom tool directly from a cell formula (e.g., `=FSF("some_operation",A1)`), treating complex LLM reasoning as a standard spreadsheet function.
 - **UC-002 (Bridge Management)**: Using a dedicated widget UI to monitor available models, check the status of the connection, and view the execution history of agent calls.
 - **UC-003 (Flow Control)**: Pausing execution to batch edits in the spreadsheet, then resuming to process all queued agent tasks, or manually rerunning a specific task that failed.
 
